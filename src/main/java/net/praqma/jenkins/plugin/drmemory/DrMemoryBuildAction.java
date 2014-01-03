@@ -27,7 +27,6 @@ import org.jfree.ui.RectangleInsets;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
-import net.praqma.drmemory.DrMemoryResult;
 import net.praqma.jenkins.plugin.drmemory.graphs.AbstractGraph;
 import hudson.model.AbstractBuild;
 import hudson.model.Action;
@@ -47,12 +46,12 @@ public class DrMemoryBuildAction implements Action {
     private final AbstractBuild<?, ?> build;
     private List<DrMemoryPublisher> publishers;
     private List<DrMemoryBuilder> builders;
-    private List<DrMemoryResult> results;
+    private List<DrMemoryResult2> results;
 
     protected DrMemoryBuildAction(AbstractBuild<?, ?> build) {
         this.build = build;
         this.builders = new ArrayList<DrMemoryBuilder>();
-        this.results = new ArrayList<DrMemoryResult>();
+        this.results = new ArrayList<DrMemoryResult2>();
         this.publishers = new ArrayList<DrMemoryPublisher>();
     }
 
@@ -69,7 +68,7 @@ public class DrMemoryBuildAction implements Action {
         return publishers;
     }
 
-    public void addResult(DrMemoryResult result) {
+    public void addResult(DrMemoryResult2 result) {
         this.results.add(result);
     }
 
@@ -92,7 +91,7 @@ public class DrMemoryBuildAction implements Action {
         return "drmemory";
     }
 
-    public List<DrMemoryResult> getResults() {
+    public List<DrMemoryResult2> getResults() {
         return results;
     }
     
@@ -196,7 +195,7 @@ public class DrMemoryBuildAction implements Action {
             }
             
             /* Sum all results */
-            for(DrMemoryResult result : a.getResults()) {
+            for(DrMemoryResult2 result : a.getResults()) {
 	            float[] ns = g.getNumber(result);
 	            for(int i=0; i < ns.length; ++i) {
 	            	sums[i] += ns[i];
@@ -239,9 +238,6 @@ public class DrMemoryBuildAction implements Action {
                 );
 
         // NOW DO SOME OPTIONAL CUSTOMISATION OF THE CHART...
-
-        final LegendTitle legend = chart.getLegend();
-
 
         chart.setBackgroundPaint(Color.white);
 

@@ -3,7 +3,6 @@ package net.praqma.jenkins.plugin.drmemory;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +12,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.praqma.drmemory.DrMemoryResult;
 import net.praqma.drmemory.exceptions.InvalidInputException;
 import net.praqma.jenkins.plugin.drmemory.graphs.AbstractGraph;
 import net.praqma.jenkins.plugin.drmemory.graphs.ActualLeaksGraph;
@@ -45,7 +43,7 @@ import hudson.tasks.Recorder;
 
 public class DrMemoryPublisher extends Recorder {
 
-    private static final Logger log = Logger.getLogger(DrMemoryPublisher.class.getName());
+    private static final Logger logger = Logger.getLogger(DrMemoryPublisher.class.getName());
     public static final String __OUTPUT = "drmemory.txt";
     private String logPath;
     public static Map<String, AbstractGraph> graphTypes = new HashMap<String, AbstractGraph>();
@@ -113,28 +111,15 @@ public class DrMemoryPublisher extends Recorder {
 
         /* Read all results */
         for (FilePath result : resultFiles) {
-	        try {
-	            DrMemoryResult dresult = DrMemoryResult.parse(new File(result.toString()));
+        	try {
+	            DrMemoryResult2 dresult = DrMemoryResult2.parse(new File(result.toString()));
 	            String directory_name = result.getParent().getName();
 	            Matcher match = directory_pattern.matcher(directory_name);
 	            
 	            if(match.find()) {
 		            String name = match.group(1);
-		            int pid = Integer.parseInt(match.group(2));
-		            
-		            try {
-						Field cmd = dresult.getClass().getDeclaredField("cmd");
-						cmd.setAccessible(true);
-						cmd.set(dresult, name);
-					} catch (SecurityException e) {
-						e.printStackTrace();
-					} catch (NoSuchFieldException e) {
-						e.printStackTrace();
-					} catch (IllegalArgumentException e) {
-						e.printStackTrace();
-					} catch (IllegalAccessException e) {
-						e.printStackTrace();
-					}
+		            //int pid = Integer.parseInt(match.group(2));
+		            dresult.setCmd(name);
 		        }
 	            action.addResult(dresult);
 	        } catch (InvalidInputException e) {

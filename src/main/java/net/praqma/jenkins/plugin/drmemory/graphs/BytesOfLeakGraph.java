@@ -1,13 +1,13 @@
 package net.praqma.jenkins.plugin.drmemory.graphs;
 
+import net.praqma.jenkins.plugin.drmemory.DrMemoryResult2;
 import hudson.util.ChartUtil;
 import hudson.util.DataSetBuilder;
 import hudson.util.ChartUtil.NumberOnlyBuildLabel;
-import net.praqma.drmemory.DrMemoryResult;
 
 public class BytesOfLeakGraph extends AbstractGraph {
 	@Override
-	public float[] getNumber( DrMemoryResult r ) {
+	public float[] getNumber( DrMemoryResult2 r ) {
 		float values[] = new float[] { r.getBytesOfLeaks().total, r.getBytesOfPossibleLeaks().total };
 		
 		return values;
