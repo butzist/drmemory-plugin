@@ -168,7 +168,6 @@ public class DrMemoryBuildAction implements Action {
 
         boolean latest = true;
         String yaxis = "???";
-        float min = Float.MAX_VALUE;
         float max = 0;
 
         AbstractGraph g = DrMemoryPublisher.getGraphTypes().get(type);
@@ -189,42 +188,28 @@ public class DrMemoryBuildAction implements Action {
             
         	int fields = g.getNumber(a.getResults().get(0)).length;
             float[] sums = new float[fields];
-
-        	for(int i=0; i < fields; ++i) {
-            	sums[i] = 0;
-            }
             
             /* Sum all results */
             for(DrMemoryResult2 result : a.getResults()) {
 	            float[] ns = g.getNumber(result);
 	            for(int i=0; i < ns.length; ++i) {
-	            	sums[i] += ns[i];
+	            	sums[i] += ns[i];      	
+	            	max = Math.max(max,sums[i]);
 	            }
             }
             
             g.addX(dsb, sums, label);
 
-            for (float n : sums) {
-                if (n > max) {
-                    max = n;
-                }
-
-                if (n < min) {
-                    min = n;
-                }
-            }
-
             if (latest) {
                 yaxis = g.getYAxis();
+                latest = false;
             }
-
-            latest = false;
         }
 
-        ChartUtil.generateGraph(req, rsp, createChart(dsb.build(), g.getTitle(), yaxis, (int) max, (int) min), width, height);
+        ChartUtil.generateGraph(req, rsp, createChart(dsb.build(), g.getTitle(), yaxis, (int) max), width, height);
     }
 
-    private JFreeChart createChart(CategoryDataset dataset, String title, String yaxis, int max, int min) {
+    private JFreeChart createChart(CategoryDataset dataset, String title, String yaxis, int max) {
 
         final JFreeChart chart = ChartFactory.createLineChart(title, // chart
                 // title
@@ -259,7 +244,7 @@ public class DrMemoryBuildAction implements Action {
         final NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
         rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
         rangeAxis.setUpperBound(max);
-        rangeAxis.setLowerBound(min);
+        rangeAxis.setLowerBound(0);
 
         final LineAndShapeRenderer renderer = (LineAndShapeRenderer) plot.getRenderer();
         renderer.setBaseStroke(new BasicStroke(2.0f));
